@@ -16,7 +16,7 @@ int print_file_content(char* str) {
 
   fseek(ptr, 0, SEEK_SET); //move pointer to start of file
   
-  fread(fcontent, MAX_STR_SIZE, sizeof(char*), ptr);
+  fread(fcontent, MAX_STR_SIZE, sizeof(char), ptr);
 
   printf("%s\n", fcontent);
 
