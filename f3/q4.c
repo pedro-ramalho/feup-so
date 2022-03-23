@@ -10,7 +10,6 @@
 
 #define   MAX_STR_SIZE        128
 
-
 char* get_file_content(const char* str) {
   FILE* ptr;
   ptr = fopen(str, READING_MODE);
