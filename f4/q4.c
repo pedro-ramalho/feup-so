@@ -1,16 +1,13 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-
 #include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/uio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 
-int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    (void)fprintf(stderr, "usage: %s perms file\n", argv[0]);
-    return EXIT_FAILURE;
-  }
-
-  int perms = atoi(argv[1]);
+void set_perms(int given_perms, const char* file) {
+  int perms = atoi(given_perms);
 
   int operms = perms % 10; //owner perms
   perms /= 10;
@@ -32,7 +29,6 @@ int main(int argc, char* argv[]) {
     case 6: newperms |= S_IRUSR | S_IWUSR; break;
     case 7: newperms |= S_IRUSR | S_IWUSR | S_IXUSR; break;
     default:
-      (void)printf(stderr, "%s: illegal permission value\n", argv[0]);
       return EXIT_FAILURE;
   }
 
@@ -46,7 +42,6 @@ int main(int argc, char* argv[]) {
     case 6: newperms |= S_IRGRP | S_IWGRP; break;
     case 7: newperms |= S_IRGRP | S_IWGRP | S_IXGRP; break;
     default:
-      (void)printf(stderr, "%s: illegall permission value\n", argv[0]);
       return EXIT_FAILURE;
   }
 
@@ -60,11 +55,28 @@ int main(int argc, char* argv[]) {
     case 6: newperms |= S_IROTH | S_IWOTH; break;
     case 7: newperms |= S_IROTH | S_IWOTH | S_IXOTH; break;
     default:
-      (void)fprintf(stderr, "%s: illegal permission value\n", argv[0]);
       return EXIT_FAILURE;
   }
 
-  chmod(argv[2], newperms);
+  chmod(file, newperms);
+
+  return EXIT_SUCCESS;
+}
+
+int main(int argc, char* argv[]) {
+  if (argc < 2) {
+    printf("usage: touch filename\n");
+    return EXIT_FAILURE;
+  }
+
+  struct stat info;
+
+  if (lstat(argv[1], &info) == -1) { //file does not exist, create it and set perms to 644
+    int fd = open(argv[1], O_CREAT);
+    set_perms(644, argv[1]);    
+  }
+  else //file exists, update modified date
+    utime(argv[1], NULL);    
   
   return EXIT_SUCCESS;
 }
