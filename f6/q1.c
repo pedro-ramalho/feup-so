@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
     if (waitpid(pid, NULL, 0) < 0) {
       fprintf(stderr, "Cannot wait for child: %s\n", strerror(errno));
     }
+    
     exit(EXIT_SUCCESS);
   }
   else {
