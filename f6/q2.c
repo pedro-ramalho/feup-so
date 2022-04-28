@@ -16,11 +16,13 @@ int main(int argc, char* argv[]) {
   pid_t pid;
 
   if (pipe(fd) < 0) {
-    /* pipe error */
+    perror("pipe error");
+    exit(EXIT_FAILURE);
   }
 
   if ((pid = fork()) < 0) {
-    /* fork error */
+    perror("fork error");
+    exit(EXIT_FAILURE);
   }
 
   if (pid > 0) {
@@ -32,7 +34,7 @@ int main(int argc, char* argv[]) {
     // parent writes to the pipe
 
     if (execvp(cmd1[0], cmd1) < 0) {
-      /* exec error */
+      fprintf(stderr, "execvp error %s\n", strerror(errno));
     }
   }
   else {
@@ -43,8 +45,9 @@ int main(int argc, char* argv[]) {
     close(fd[READ_END]);
     
     if (execvp(cmd2[0], cmd2) < 0) {
-      /* exec error */
+      fprintf(stderr, "execvp error %s\n", strerror(errno));
     }
   }
+
   return 0;
 }
